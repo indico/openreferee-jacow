@@ -1,0 +1,275 @@
+components:
+  schemas:
+    Editable:
+      properties:
+        endpoints:
+          $ref: '#/components/schemas/EditableEndpoints'
+        files:
+          items:
+            $ref: '#/components/schemas/File'
+          type: array
+      required:
+      - endpoints
+      type: object
+    EditableEndpoints:
+      properties:
+        file_upload:
+          type: string
+        revisions:
+          $ref: '#/components/schemas/Generated'
+      required:
+      - file_upload
+      type: object
+    Event:
+      properties:
+        endpoints:
+          $ref: '#/components/schemas/EventEndpoints'
+        title:
+          type: string
+        token:
+          type: string
+        url:
+          format: url
+          type: string
+      required:
+      - endpoints
+      - title
+      - token
+      - url
+      type: object
+    EventEndpoints:
+      properties:
+        editable_types:
+          type: string
+        file_types:
+          additionalProperties:
+            $ref: '#/components/schemas/ListEndpoint'
+          type: object
+        tags:
+          $ref: '#/components/schemas/ListEndpoint'
+      required:
+      - editable_types
+      - file_types
+      type: object
+    EventInfo:
+      properties:
+        can_disconnect:
+          type: boolean
+        service:
+          $ref: '#/components/schemas/EventInfoService'
+        title:
+          type: string
+        url:
+          format: url
+          type: string
+      required:
+      - can_disconnect
+      - service
+      - title
+      - url
+      type: object
+    EventInfoService:
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+      type: object
+    File:
+      properties:
+        content_type:
+          type: string
+        external_download_url:
+          type: string
+        file_type:
+          format: int32
+          type: integer
+        filename:
+          type: string
+        uuid:
+          type: string
+      required:
+      - external_download_url
+      - file_type
+      - filename
+      type: object
+    Generated:
+      properties:
+        replace:
+          type: string
+      required:
+      - replace
+      type: object
+    ListEndpoint:
+      properties:
+        create:
+          type: string
+        list:
+          type: string
+      required:
+      - create
+      - list
+      type: object
+    ServiceInfo:
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+      required:
+      - name
+      - version
+      type: object
+    Success:
+      properties:
+        success:
+          type: boolean
+      required:
+      - success
+      type: object
+  securitySchemes:
+    bearer_token:
+      scheme: bearer
+      type: http
+info:
+  contact:
+    email: indico-team@cern.ch
+    name: Indico Team
+    url: https://github.com/indico/openreferee
+  title: OpenReferee
+  version: 0.0.1
+openapi: 3.0.2
+paths:
+  /info:
+    get:
+      description: Get service info
+      operationId: getServiceInfo
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceInfo'
+          description: Service Info
+      tags:
+      - service
+      - information
+  /event/{identifier}:
+    put:
+      description: Create an Event
+      operationId: createEvent
+      parameters:
+      - description: The unique ID which represents the event
+        in: path
+        name: identifier
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Event Created
+      tags:
+      - event
+      - create
+    delete:
+      description: Remove an Event
+      operationId: removeEvent
+      parameters:
+      - description: The unique ID which represents the event
+        in: path
+        name: identifier
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Event Removed
+      security:
+      - bearer_token: []
+      tags:
+      - event
+      - remove
+    get:
+      description: Get information about an event
+      operationId: getEvent
+      parameters:
+      - description: The unique ID which represents the event
+        in: path
+        name: identifier
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventInfo'
+          description: Event Info
+      security:
+      - bearer_token: []
+      tags:
+      - event
+      - get
+  /event/{identifier}/editable/{editable_type}/{contrib_id}:
+    put:
+      description: Called when a new editable is created
+      operationId: createEditable
+      parameters:
+      - description: The unique ID which represents the event
+        in: path
+        name: identifier
+        required: true
+        schema:
+          type: string
+      - description: The unique ID which represents the contribution
+        in: path
+        name: contrib_id
+        required: true
+        schema:
+          format: int32
+          type: integer
+      - description: The name which represents the editable type
+        in: path
+        name: editable_type
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Editable'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Editable processed
+      security:
+      - bearer_token: []
+      tags:
+      - editable
+      - create
+servers: []
+tags:
+- name: create
+- name: event
+- name: get
+- name: info
+- name: remove
+- name: service

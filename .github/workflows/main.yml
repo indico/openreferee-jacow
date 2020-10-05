@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  diff-openapi-spec:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+          architecture: 'x64'
+
+      - name: Install dependencies
+        run: |
+          pip install -e '.[dev]'
+          npm ci
+
+      - name: Generate OpenAPI spec from the application
+        run: |
+          cp specs/openreferee.yaml specs/openreferee.old.yaml
+          npm run api-spec
+
+      - name: Check OpenAPI spec for changes
+        run: diff --color -u specs/openreferee.old.yaml specs/openreferee.yaml
