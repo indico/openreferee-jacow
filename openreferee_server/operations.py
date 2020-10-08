@@ -1,12 +1,12 @@
 import os
+import tempfile
 from collections import defaultdict
-from io import BytesIO
-from pathlib import Path
 
 import requests
 from flask import current_app
 from PyPDF2 import PdfFileReader, PdfFileWriter
 
+from . import ghostscript
 from .defaults import (
     CUSTOM_ACTIONS,
     DEFAULT_EDITABLES,
@@ -123,25 +123,32 @@ def process_editable_files(session, event, files, endpoints):
 
 
 def process_pdf(file, session, upload_endpoint):
-    pdf_writer = PdfFileWriter()
-    resp = session.get(file["signed_download_url"])
-    resp.raise_for_status()
-    pdf_reader = PdfFileReader(BytesIO(resp.content))
-    with (Path(__file__).parent / "watermark.pdf").open("rb") as watermark_file:
-        watermark_pdf = PdfFileReader(watermark_file)
-        watermark_page = watermark_pdf.getPage(0)
-        for i in range(pdf_reader.numPages):
-            page = pdf_reader.getPage(i)
-            page.mergePage(watermark_page)
-            pdf_writer.addPage(page)
-        with BytesIO() as buf:
-            pdf_writer.write(buf)
-            buf.seek(0)
-            r = session.post(
-                upload_endpoint,
-                files={"file": (file["filename"], buf, file["content_type"])},
-            )
-            return r.json()
+    _dir = os.path.dirname(__file__)
+    with tempfile.NamedTemporaryFile() as out_file, tempfile.NamedTemporaryFile() as in_file:
+        resp = session.get(file["signed_download_url"])
+        in_file.write(resp.content)
+        in_file.seek(0)
+        args = [
+            "-dBATCH", "-dNOPAUSE", "-dSAFER",
+            "-dFIXEDMEDIA", "-dDEVICEWIDTHPOINTS=595", "-dDEVICEHEIGHTPOINTS=792",
+            "-sDEVICE=pdfwrite",
+            "-r1200", "-dCompatibilityLevel=1.6",
+            "-dPDFSETTINGS=/prepress",
+            "-dSubsetFonts=true",
+            "-dCompressFonts=false",
+            "-dEmbedAllFonts=true",
+            "-dNOPLATFONTS",
+            "-I " + os.path.join(_dir, 'gsfonts'),
+            "-sFONTPATH=" + os.path.join(_dir, "gsfonts"),
+            "-sOutputFile=" + out_file.name,
+            in_file.name
+        ]
+        ghostscript.run_file(args)
+        r = session.post(
+            upload_endpoint,
+            files={"file": (file["filename"], out_file, file["content_type"])},
+        )
+        return r.json()
 
 
 def process_accepted_revision(event, revision):

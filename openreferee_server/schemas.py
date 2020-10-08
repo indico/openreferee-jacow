@@ -64,7 +64,7 @@ class UnclaimedFileSchema(_BaseFileSchema):
 
 
 class FileSchema(_BaseFileSchema):
-    external_download_url = fields.String(required=True)
+    signed_download_url = fields.String(required=True)
 
 
 class TagSchema(Schema):
