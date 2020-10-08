@@ -1,15 +1,44 @@
 components:
   schemas:
-    Editable:
+    Comment:
       properties:
+        internal:
+          type: boolean
+        text:
+          type: string
+      type: object
+    CreateEditable:
+      properties:
+        editable:
+          $ref: '#/components/schemas/Editable'
         endpoints:
           $ref: '#/components/schemas/EditableEndpoints'
-        files:
-          items:
-            $ref: '#/components/schemas/File'
-          type: array
+        revision:
+          $ref: '#/components/schemas/Revision'
       required:
+      - editable
       - endpoints
+      - revision
+      type: object
+    Editable:
+      properties:
+        editor:
+          allOf:
+          - $ref: '#/components/schemas/EditingUser'
+          nullable: true
+        id:
+          type: integer
+        revision_count:
+          type: integer
+        state:
+          type: string
+        timeline_url:
+          type: string
+        type:
+          type: string
+      required:
+      - id
+      - state
       type: object
     EditableEndpoints:
       properties:
@@ -19,6 +48,21 @@ components:
           $ref: '#/components/schemas/Generated'
       required:
       - file_upload
+      type: object
+    EditingUser:
+      properties:
+        avatar_bg_color:
+          type: string
+        full_name:
+          type: string
+        id:
+          type: integer
+        identifier:
+          type: string
+      required:
+      - full_name
+      - id
+      - identifier
       type: object
     Event:
       properties:
@@ -75,29 +119,14 @@ components:
         version:
           type: string
       type: object
-    File:
-      properties:
-        content_type:
-          type: string
-        external_download_url:
-          type: string
-        file_type:
-          format: int32
-          type: integer
-        filename:
-          type: string
-        uuid:
-          type: string
-      required:
-      - external_download_url
-      - file_type
-      - filename
-      type: object
     Generated:
       properties:
+        details:
+          type: string
         replace:
           type: string
       required:
+      - details
       - replace
       type: object
     ListEndpoint:
@@ -110,6 +139,130 @@ components:
       - create
       - list
       type: object
+    ReviewEditable:
+      properties:
+        action:
+          type: string
+        endpoints:
+          $ref: '#/components/schemas/EditableEndpoints'
+        revision:
+          $ref: '#/components/schemas/TransientRevision'
+      required:
+      - action
+      - endpoints
+      - revision
+      type: object
+    ReviewResponse:
+      properties:
+        comment:
+          type: string
+        comments:
+          items:
+            $ref: '#/components/schemas/Comment'
+          type: array
+        publish:
+          type: boolean
+        tags:
+          items:
+            type: integer
+          type: array
+      type: object
+    Revision:
+      properties:
+        comment:
+          type: string
+        editor:
+          allOf:
+          - $ref: '#/components/schemas/EditingUser'
+          nullable: true
+        files:
+          items:
+            $ref: '#/components/schemas/SignedFile'
+          type: array
+        final_state:
+          $ref: '#/components/schemas/RevisionState'
+        initial_state:
+          $ref: '#/components/schemas/RevisionState'
+        submitter:
+          $ref: '#/components/schemas/EditingUser'
+        tags:
+          items:
+            $ref: '#/components/schemas/Tag'
+          type: array
+      required:
+      - comment
+      - submitter
+      type: object
+    RevisionState:
+      properties:
+        css_class:
+          nullable: true
+          type: string
+        name:
+          type: string
+        title:
+          nullable: true
+          type: string
+      required:
+      - name
+      type: object
+    ServiceAction:
+      properties:
+        color:
+          default: null
+          nullable: true
+          type: string
+        confirm:
+          default: null
+          nullable: true
+          type: string
+        icon:
+          default: null
+          nullable: true
+          type: string
+        name:
+          type: string
+        title:
+          type: string
+      required:
+      - name
+      - title
+      type: object
+    ServiceActionResult:
+      properties:
+        comments:
+          items:
+            $ref: '#/components/schemas/Comment'
+          type: array
+        publish:
+          default: null
+          nullable: true
+          type: boolean
+        redirect:
+          default: null
+          nullable: true
+          type: string
+        tags:
+          items:
+            type: integer
+          type: array
+      type: object
+    ServiceActionsRequest:
+      properties:
+        revision:
+          $ref: '#/components/schemas/Revision'
+        user:
+          $ref: '#/components/schemas/User'
+        user_is_editor:
+          type: boolean
+        user_is_submitter:
+          type: boolean
+      required:
+      - revision
+      - user
+      - user_is_editor
+      - user_is_submitter
+      type: object
     ServiceInfo:
       properties:
         name:
@@ -120,12 +273,111 @@ components:
       - name
       - version
       type: object
+    ServiceTriggerActionRequest:
+      properties:
+        action:
+          type: string
+        revision:
+          $ref: '#/components/schemas/Revision'
+        user:
+          $ref: '#/components/schemas/User'
+        user_is_editor:
+          type: boolean
+        user_is_submitter:
+          type: boolean
+      required:
+      - action
+      - revision
+      - user
+      - user_is_editor
+      - user_is_submitter
+      type: object
+    SignedFile:
+      properties:
+        content_type:
+          type: string
+        file_type:
+          type: integer
+        filename:
+          type: string
+        signed_download_url:
+          type: string
+        uuid:
+          type: string
+      required:
+      - file_type
+      - filename
+      - signed_download_url
+      - uuid
+      type: object
     Success:
       properties:
         success:
           type: boolean
       required:
       - success
+      type: object
+    Tag:
+      properties:
+        code:
+          type: string
+        color:
+          type: string
+        id:
+          type: integer
+        is_used_in_revision:
+          type: boolean
+        system:
+          type: boolean
+        title:
+          type: string
+        url:
+          type: string
+        verbose_title:
+          type: string
+      required:
+      - code
+      - id
+      - title
+      type: object
+    TransientRevision:
+      properties:
+        comment:
+          type: string
+        editor:
+          allOf:
+          - $ref: '#/components/schemas/EditingUser'
+          nullable: true
+        files:
+          items:
+            $ref: '#/components/schemas/SignedFile'
+          type: array
+        final_state:
+          $ref: '#/components/schemas/RevisionState'
+        initial_state:
+          $ref: '#/components/schemas/RevisionState'
+        submitter:
+          $ref: '#/components/schemas/EditingUser'
+        tags:
+          items:
+            $ref: '#/components/schemas/Tag'
+          type: array
+      required:
+      - comment
+      - submitter
+      type: object
+    User:
+      properties:
+        email:
+          type: string
+        full_name:
+          type: string
+        id:
+          type: integer
+      required:
+      - email
+      - full_name
+      - id
       type: object
   securitySchemes:
     bearer_token:
@@ -240,7 +492,6 @@ paths:
         name: contrib_id
         required: true
         schema:
-          format: int32
           type: integer
       - description: The name which represents the editable type
         in: path
@@ -252,19 +503,157 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Editable'
+              $ref: '#/components/schemas/CreateEditable'
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Success'
           description: Editable processed
       security:
       - bearer_token: []
       tags:
       - editable
       - create
+  /event/{identifier}/editable/{editable_type}/{contrib_id}/{revision_id}:
+    post:
+      description: Called when a new editable is revised
+      operationId: reviewEditable
+      parameters:
+      - description: The unique ID which represents the event
+        in: path
+        name: identifier
+        required: true
+        schema:
+          type: string
+      - description: The unique ID which represents the contribution
+        in: path
+        name: contrib_id
+        required: true
+        schema:
+          type: integer
+      - description: The name which represents the editable type
+        in: path
+        name: editable_type
+        required: true
+        schema:
+          type: string
+      - description: The unique ID which represents the revision
+        in: path
+        name: revision_id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewEditable'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+          description: Review processed
+      security:
+      - bearer_token: []
+      tags:
+      - editable
+      - review
+  /event/{identifier}/editable/{editable_type}/{contrib_id}/{revision_id}/actions:
+    post:
+      description: Called when the timeline is accessed by an editor or submitter
+      operationId: getCustomRevisionActions
+      parameters:
+      - description: The unique ID which represents the event
+        in: path
+        name: identifier
+        required: true
+        schema:
+          type: string
+      - description: The unique ID which represents the contribution
+        in: path
+        name: contrib_id
+        required: true
+        schema:
+          type: integer
+      - description: The name which represents the editable type
+        in: path
+        name: editable_type
+        required: true
+        schema:
+          type: string
+      - description: The unique ID which represents the revision
+        in: path
+        name: revision_id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceActionsRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ServiceAction'
+                type: array
+          description: List of available actions
+      security:
+      - bearer_token: []
+      tags:
+      - editable
+      - review
+  /event/{identifier}/editable/{editable_type}/{contrib_id}/{revision_id}/action:
+    post:
+      description: Called when a user clicks a custom action button
+      operationId: triggerCustomRevisionAction
+      parameters:
+      - description: The unique ID which represents the event
+        in: path
+        name: identifier
+        required: true
+        schema:
+          type: string
+      - description: The unique ID which represents the contribution
+        in: path
+        name: contrib_id
+        required: true
+        schema:
+          type: integer
+      - description: The name which represents the editable type
+        in: path
+        name: editable_type
+        required: true
+        schema:
+          type: string
+      - description: The unique ID which represents the revision
+        in: path
+        name: revision_id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceTriggerActionRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ServiceActionResult'
+                type: array
+          description: List of available actions
+      security:
+      - bearer_token: []
+      tags:
+      - editable
+      - review
 servers: []
 tags:
 - name: create

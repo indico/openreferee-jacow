@@ -52,18 +52,11 @@ class EventInfoSchema(Schema):
     )
 
 
-class _BaseFileSchema(Schema):
+class SignedFileSchema(Schema):
     uuid = fields.String(required=True)
     filename = fields.String(required=True)
     content_type = fields.String()
     file_type = fields.Integer(required=True)
-
-
-class UnclaimedFileSchema(_BaseFileSchema):
-    signed_download_url = fields.String(required=True)
-
-
-class FileSchema(_BaseFileSchema):
     signed_download_url = fields.String(required=True)
 
 
@@ -110,13 +103,11 @@ class _BaseRevisionSchema(Schema):
 
 
 class RevisionSchema(_BaseRevisionSchema):
-    files = fields.List(fields.Nested(FileSchema, unknown=EXCLUDE, required=True))
+    files = fields.List(fields.Nested(SignedFileSchema, unknown=EXCLUDE, required=True))
 
 
 class TransientRevisionSchema(_BaseRevisionSchema):
-    files = fields.List(
-        fields.Nested(UnclaimedFileSchema, unknown=EXCLUDE, required=True)
-    )
+    files = fields.List(fields.Nested(SignedFileSchema, unknown=EXCLUDE, required=True))
 
 
 class CreateEditableSchema(Schema):
