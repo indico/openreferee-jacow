@@ -15,10 +15,13 @@ components:
           $ref: '#/components/schemas/EditableEndpoints'
         revision:
           $ref: '#/components/schemas/Revision'
+        user:
+          $ref: '#/components/schemas/User'
       required:
       - editable
       - endpoints
       - revision
+      - user
       type: object
     Editable:
       properties:
@@ -147,10 +150,13 @@ components:
           $ref: '#/components/schemas/EditableEndpoints'
         revision:
           $ref: '#/components/schemas/TransientRevision'
+        user:
+          $ref: '#/components/schemas/User'
       required:
       - action
       - endpoints
       - revision
+      - user
       type: object
     ReviewResponse:
       properties:

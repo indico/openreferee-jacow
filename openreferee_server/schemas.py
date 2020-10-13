@@ -110,16 +110,34 @@ class TransientRevisionSchema(_BaseRevisionSchema):
     files = fields.List(fields.Nested(SignedFileSchema, unknown=EXCLUDE, required=True))
 
 
+class RoleSchema(Schema):
+    name = fields.String()
+    code = fields.String()
+    source = fields.String(validate=validate.OneOf(["event", "category"]))
+
+
+class UserSchema(Schema):
+    id = fields.Integer(required=True)
+    full_name = fields.String(required=True)
+    email = fields.String(required=True)
+    manager = fields.Boolean(required=True)
+    editor = fields.Boolean(required=True)
+    submitter = fields.Boolean(required=True)
+    roles = fields.List(fields.Nested(RoleSchema), required=True)
+
+
 class CreateEditableSchema(Schema):
     editable = fields.Nested(EditableSchema, required=True)
     revision = fields.Nested(RevisionSchema, unknown=EXCLUDE, required=True)
     endpoints = fields.Nested(EditableEndpointsSchema, required=True)
+    user = fields.Nested(UserSchema, required=True)
 
 
 class ReviewEditableSchema(Schema):
     action = fields.String(required=True)
     revision = fields.Nested(TransientRevisionSchema, unknown=EXCLUDE, required=True)
     endpoints = fields.Nested(EditableEndpointsSchema, required=True)
+    user = fields.Nested(UserSchema, required=True)
 
 
 class CommentSchema(Schema):
@@ -169,22 +187,6 @@ class ReviewParameters(EditableParameters):
     revision_id = fields.String(
         required=True, description="The unique ID which represents the revision"
     )
-
-
-class RoleSchema(Schema):
-    name = fields.String()
-    code = fields.String()
-    source = fields.String(validate=validate.OneOf(["event", "category"]))
-
-
-class UserSchema(Schema):
-    id = fields.Integer(required=True)
-    full_name = fields.String(required=True)
-    email = fields.String(required=True)
-    manager = fields.Boolean(required=True)
-    editor = fields.Boolean(required=True)
-    submitter = fields.Boolean(required=True)
-    roles = fields.List(fields.Nested(RoleSchema), required=True)
 
 
 class ServiceActionsRequestSchema(Schema):
