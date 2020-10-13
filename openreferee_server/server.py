@@ -290,8 +290,6 @@ def get_custom_revision_actions(
     revision_id,
     revision,
     user,
-    user_is_editor,
-    user_is_submitter,
 ):
     """Get custom actions for a revision
     ---
@@ -317,11 +315,8 @@ def get_custom_revision_actions(
                 type: array
                 items: ServiceActionSchema
     """
-
     return jsonify(
-        ServiceActionSchema(many=True).dump(
-            get_custom_actions(event, revision, user_is_editor)
-        )
+        ServiceActionSchema(many=True).dump(get_custom_actions(event, revision, user))
     )
 
 
@@ -338,8 +333,6 @@ def custom_revision_action(
     revision_id,
     revision,
     user,
-    user_is_editor,
-    user_is_submitter,
     action,
 ):
     """Trigger a custom action for a revision
@@ -367,7 +360,7 @@ def custom_revision_action(
                 items: ServiceActionResultSchema
     """
 
-    resp = process_custom_action(event, revision, action, user_is_editor)
+    resp = process_custom_action(event, revision, action, user)
     return jsonify(ServiceActionResultSchema().dump(resp))
 
 

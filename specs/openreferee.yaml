@@ -206,6 +206,18 @@ components:
       required:
       - name
       type: object
+    Role:
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        source:
+          enum:
+          - event
+          - category
+          type: string
+      type: object
     ServiceAction:
       properties:
         color:
@@ -253,15 +265,9 @@ components:
           $ref: '#/components/schemas/Revision'
         user:
           $ref: '#/components/schemas/User'
-        user_is_editor:
-          type: boolean
-        user_is_submitter:
-          type: boolean
       required:
       - revision
       - user
-      - user_is_editor
-      - user_is_submitter
       type: object
     ServiceInfo:
       properties:
@@ -281,16 +287,10 @@ components:
           $ref: '#/components/schemas/Revision'
         user:
           $ref: '#/components/schemas/User'
-        user_is_editor:
-          type: boolean
-        user_is_submitter:
-          type: boolean
       required:
       - action
       - revision
       - user
-      - user_is_editor
-      - user_is_submitter
       type: object
     SignedFile:
       properties:
@@ -368,16 +368,30 @@ components:
       type: object
     User:
       properties:
+        editor:
+          type: boolean
         email:
           type: string
         full_name:
           type: string
         id:
           type: integer
+        manager:
+          type: boolean
+        roles:
+          items:
+            $ref: '#/components/schemas/Role'
+          type: array
+        submitter:
+          type: boolean
       required:
+      - editor
       - email
       - full_name
       - id
+      - manager
+      - roles
+      - submitter
       type: object
   securitySchemes:
     bearer_token:

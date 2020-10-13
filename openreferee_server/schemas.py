@@ -1,4 +1,4 @@
-from marshmallow import EXCLUDE, Schema
+from marshmallow import EXCLUDE, Schema, validate
 from webargs import fields
 
 from .defaults import SERVICE_INFO
@@ -171,17 +171,25 @@ class ReviewParameters(EditableParameters):
     )
 
 
+class RoleSchema(Schema):
+    name = fields.String()
+    code = fields.String()
+    source = fields.String(validate=validate.OneOf(["event", "category"]))
+
+
 class UserSchema(Schema):
     id = fields.Integer(required=True)
     full_name = fields.String(required=True)
     email = fields.String(required=True)
+    manager = fields.Boolean(required=True)
+    editor = fields.Boolean(required=True)
+    submitter = fields.Boolean(required=True)
+    roles = fields.List(fields.Nested(RoleSchema), required=True)
 
 
 class ServiceActionsRequestSchema(Schema):
     revision = fields.Nested(RevisionSchema, unknown=EXCLUDE, required=True)
     user = fields.Nested(UserSchema, required=True)
-    user_is_submitter = fields.Boolean(required=True)
-    user_is_editor = fields.Boolean(required=True)
 
 
 class ServiceTriggerActionRequestSchema(ServiceActionsRequestSchema):

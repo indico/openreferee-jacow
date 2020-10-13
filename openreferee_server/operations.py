@@ -177,8 +177,8 @@ def process_revision(event, revision, action):
     )
 
 
-def _can_access_action(revision, action, user_is_editor):
-    if not user_is_editor:
+def _can_access_action(revision, action, user):
+    if not user["editor"]:
         return False
     if revision["final_state"]["name"] == "accepted":
         if any(t["code"] == "QA_APPROVED" for t in revision["tags"]):
@@ -188,16 +188,12 @@ def _can_access_action(revision, action, user_is_editor):
     return action == "lol"
 
 
-def get_custom_actions(event, revision, user_is_editor):
-    return [
-        a
-        for a in CUSTOM_ACTIONS
-        if _can_access_action(revision, a["name"], user_is_editor)
-    ]
+def get_custom_actions(event, revision, user):
+    return [a for a in CUSTOM_ACTIONS if _can_access_action(revision, a["name"], user)]
 
 
-def process_custom_action(event, revision, action, user_is_editor):
-    if not _can_access_action(revision, action, user_is_editor):
+def process_custom_action(event, revision, action, user):
+    if not _can_access_action(revision, action, user["editor"]):
         return {}
     if action == "lol":
         return {
