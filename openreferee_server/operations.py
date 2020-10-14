@@ -193,7 +193,7 @@ def get_custom_actions(event, revision, user):
 
 
 def process_custom_action(event, revision, action, user):
-    if not _can_access_action(revision, action, user["editor"]):
+    if not _can_access_action(revision, action, user):
         return {}
     if action == "lol":
         return {
