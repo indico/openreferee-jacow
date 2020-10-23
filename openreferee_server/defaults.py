@@ -46,6 +46,9 @@ DEFAULT_FILE_TYPES = {
         },
     ],
 }
+ACTION_ROLES = {
+    "SCS": {"title": "Scientific Secretary", "color": "blue"}
+}
 CUSTOM_ACTIONS = [
     {
         "name": "fail-qa",

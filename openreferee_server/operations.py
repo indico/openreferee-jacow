@@ -4,14 +4,13 @@ from collections import defaultdict
 
 import requests
 from flask import current_app
-from PyPDF2 import PdfFileReader, PdfFileWriter
 
 from . import ghostscript
 from .defaults import (
     CUSTOM_ACTIONS,
     DEFAULT_EDITABLES,
     DEFAULT_FILE_TYPES,
-    DEFAULT_TAGS,
+    DEFAULT_TAGS, ACTION_ROLES,
 )
 
 
@@ -178,14 +177,14 @@ def process_revision(event, revision, action):
 
 
 def _can_access_action(revision, action, user):
-    if not user["editor"]:
+    if not any(x["code"] in ACTION_ROLES for x in user["roles"]) and not user["editor"]:
         return False
     if revision["final_state"]["name"] == "accepted":
         if any(t["code"] == "QA_APPROVED" for t in revision["tags"]):
             return action == "fail-qa"
         else:
             return action == "approve-qa"
-    return action == "lol"
+    return False
 
 
 def get_custom_actions(event, revision, user):
@@ -195,12 +194,7 @@ def get_custom_actions(event, revision, user):
 def process_custom_action(event, revision, action, user):
     if not _can_access_action(revision, action, user):
         return {}
-    if action == "lol":
-        return {
-            "redirect": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            "comments": [{"internal": True, "text": "Nice try. How about no?"}],
-        }
-    elif action == "approve-qa":
+    if action == "approve-qa":
         session = setup_requests_session(event.token)
         available_tags = get_event_tags(session, event)
         return {
