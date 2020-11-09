@@ -114,8 +114,8 @@ def process_editable_files(session, event, files, endpoints):
         json={
             "files": uploaded,
             "state": "ready_for_review",
-            "comment": "PDF has been watermarked.",
-            "tags": [available_tags["WATERMARKED"]["id"]],
+            "comment": "The PDFs in this review have been distilled.",
+            "tags": [available_tags["PROCESSED"]["id"]],
         },
     )
     response.raise_for_status()
