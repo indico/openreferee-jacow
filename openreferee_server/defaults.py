@@ -3,11 +3,14 @@ from . import __version__
 
 SERVICE_INFO = {"version": __version__, "name": "OpenReferee JACoW"}
 DEFAULT_TAGS = {
-    "ERR_WRONG_TITLE": {"title": "Wrong Title", "color": "red", "system": False},
-    "ERR_SILLY_TITLE": {"title": "Silly Title", "color": "orange", "system": False},
-    "OK_TITLE": {"title": "Title OK", "color": "green", "system": False},
-    "PROCESSED": {"title": "Processed", "color": "brown", "system": True},
-    "QA_APPROVED": {"title": "QA Approved", "color": "green", "system": True},
+    "TC01": {"title": "Incorrect title, authors affiliation formatting", "color": "red", "system": False},
+    "TC02": {"title": "Text formatting incorrect (paragraphs, section...)", "color": "blue", "system": False},
+    "TC03": {"title": "Table formatting incorrect (not centered, outside of margins...)",
+             "color": "orange", "system": False},
+    "TC04": {"title": "Figure formatting incorrect (caption missing, outside of margins...)",
+             "color": "purple", "system": False},
+    "PRC": {"title": "Processed", "color": "brown", "system": True},
+    "QA01": {"title": "QA Approved", "color": "green", "system": True},
 }
 DEFAULT_EDITABLES = {"paper", "poster"}
 DEFAULT_FILE_TYPES = {
@@ -22,7 +25,7 @@ DEFAULT_FILE_TYPES = {
         },
         {
             "name": "Source Files",
-            "extensions": ["tex", "doc"],
+            "extensions": ["tex", "doc", "docx"],
             "allow_multiple_files": True,
             "required": True,
             "publishable": False,

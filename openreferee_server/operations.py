@@ -165,19 +165,8 @@ def process_accepted_revision(event, revision):
     )
 
 
-def process_revision(event, revision, action):
-    session = setup_requests_session(event.token)
-    available_tags = get_event_tags(session, event)
-    return dict(
-        tags=[available_tags["OK_TITLE"]["id"]],
-        comments=[
-            dict(text=f"This revision has been reviewed ({action}).", internal=True)
-        ],
-    )
-
-
 def _can_access_action(revision, action, user):
-    if not any(x["code"] in ACTION_ROLES for x in user["roles"]) and not user["editor"]:
+    if not any(x["code"] in ACTION_ROLES for x in user["roles"]):
         return False
     if revision["final_state"]["name"] == "accepted":
         if any(t["code"] == "QA_APPROVED" for t in revision["tags"]):

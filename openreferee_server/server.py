@@ -25,7 +25,6 @@ from .operations import (
     process_accepted_revision,
     process_custom_action,
     process_editable_files,
-    process_revision,
     setup_event_tags,
     setup_file_types,
     setup_requests_session,
@@ -272,10 +271,10 @@ def review_editable(
     current_app.logger.info(
         "A new revision %r was submitted for contribution %r", revision_id, contrib_id
     )
+    resp = {}
     if revision["final_state"]["name"] == "accepted":
         resp = process_accepted_revision(event, revision)
-    else:
-        resp = process_revision(event, revision, action)
+
     return ReviewResponseSchema().dump(resp), 201
 
 
