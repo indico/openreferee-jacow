@@ -22,7 +22,7 @@ def create_app():
     app = Flask(__name__)
     if os.environ.get("FLASK_ENABLE_CORS") and CORS is not None:
         CORS(app)
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URI')
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     register_error_handlers(app)
     db.init_app(app)

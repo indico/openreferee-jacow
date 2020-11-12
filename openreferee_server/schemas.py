@@ -24,6 +24,7 @@ class EditableEndpointsSchema(Schema):
         {
             "details": fields.String(required=True),
             "replace": fields.String(required=True),
+            "undo": fields.String(required=True),
         }
     )
     file_upload = fields.String(required=True)
@@ -196,6 +197,7 @@ class ServiceActionsRequestSchema(Schema):
 
 class ServiceTriggerActionRequestSchema(ServiceActionsRequestSchema):
     action = fields.String(required=True)
+    endpoints = fields.Nested(EditableEndpointsSchema, required=True)
 
 
 class ServiceActionSchema(Schema):

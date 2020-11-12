@@ -1,6 +1,8 @@
-import subprocess, sys
+import subprocess
+import sys
 
-gs = 'gswin32c' if (sys.platform == 'win32') else 'gs'
+
+gs = "gswin32c" if (sys.platform == "win32") else "gs"
 
 """
 The PDF language, unlike the PostScript language, inherently requires random access to the file.

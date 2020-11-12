@@ -7,10 +7,12 @@ from flask import current_app
 
 from . import ghostscript
 from .defaults import (
+    ACTION_ROLES,
     CUSTOM_ACTIONS,
     DEFAULT_EDITABLES,
     DEFAULT_FILE_TYPES,
-    DEFAULT_TAGS, ACTION_ROLES,
+    DEFAULT_TAGS,
+    Tag,
 )
 
 
@@ -115,7 +117,7 @@ def process_editable_files(session, event, files, endpoints):
             "files": uploaded,
             "state": "ready_for_review",
             "comment": "The PDFs in this review have been distilled.",
-            "tags": [available_tags["PROCESSED"]["id"]],
+            "tags": [available_tags[Tag.PROCESSED]["id"]],
         },
     )
     response.raise_for_status()
@@ -128,19 +130,24 @@ def process_pdf(file, session, upload_endpoint):
         in_file.write(resp.content)
         in_file.seek(0)
         args = [
-            "-dBATCH", "-dNOPAUSE", "-dSAFER",
-            "-dFIXEDMEDIA", "-dDEVICEWIDTHPOINTS=595", "-dDEVICEHEIGHTPOINTS=792",
+            "-dBATCH",
+            "-dNOPAUSE",
+            "-dSAFER",
+            "-dFIXEDMEDIA",
+            "-dDEVICEWIDTHPOINTS=595",
+            "-dDEVICEHEIGHTPOINTS=792",
             "-sDEVICE=pdfwrite",
-            "-r1200", "-dCompatibilityLevel=1.6",
+            "-r1200",
+            "-dCompatibilityLevel=1.6",
             "-dPDFSETTINGS=/prepress",
             "-dSubsetFonts=true",
             "-dCompressFonts=false",
             "-dEmbedAllFonts=true",
             "-dNOPLATFONTS",
-            "-I " + os.path.join(_dir, 'gsfonts'),
+            "-I " + os.path.join(_dir, "gsfonts"),
             "-sFONTPATH=" + os.path.join(_dir, "gsfonts"),
             "-sOutputFile=" + out_file.name,
-            in_file.name
+            in_file.name,
         ]
         ghostscript.run_file(args)
         r = session.post(
@@ -151,17 +158,12 @@ def process_pdf(file, session, upload_endpoint):
 
 
 def process_accepted_revision(event, revision):
-    publish = False
     session = setup_requests_session(event.token)
     available_tags = get_event_tags(session, event)
-    text = "This revision has been accepted but not published yet."
-    if revision["comment"] == "publish":
-        text = "This revision has been accepted for publishing."
-        publish = True
+    revision_tags = [t["id"] for t in revision["tags"]]
     return dict(
-        publish=publish,
-        tags=[available_tags["QA_APPROVED"]["id"]] if publish else [],
-        comments=[dict(text=text, internal=True)],
+        publish=False,
+        tags=revision_tags + [available_tags[Tag.QA_PENDING]["id"]],
     )
 
 
@@ -169,10 +171,9 @@ def _can_access_action(revision, action, user):
     if not any(x["code"] in ACTION_ROLES for x in user["roles"]):
         return False
     if revision["final_state"]["name"] == "accepted":
-        if any(t["code"] == "QA_APPROVED" for t in revision["tags"]):
-            return action == "fail-qa"
-        else:
-            return action == "approve-qa"
+        if any(t["code"] == Tag.QA_PENDING for t in revision["tags"]):
+            return action in ("approve-qa", "fail-qa")
+        return action == "fail-qa"
     return False
 
 
@@ -180,21 +181,34 @@ def get_custom_actions(event, revision, user):
     return [a for a in CUSTOM_ACTIONS if _can_access_action(revision, a["name"], user)]
 
 
-def process_custom_action(event, revision, action, user):
+def process_custom_action(event, revision, action, user, endpoints):
     if not _can_access_action(revision, action, user):
         return {}
+    session = setup_requests_session(event.token)
+    available_tags = get_event_tags(session, event)
+    revision_tags = [
+        t["id"]
+        for t in revision["tags"]
+        if t["id"]
+        not in [
+            available_tags[Tag.QA_APPROVED]["id"],
+            available_tags[Tag.QA_PENDING]["id"],
+        ]
+    ]
     if action == "approve-qa":
-        session = setup_requests_session(event.token)
-        available_tags = get_event_tags(session, event)
         return {
-            "tags": [available_tags["QA_APPROVED"]["id"]],
+            "tags": revision_tags + [available_tags[Tag.QA_APPROVED]["id"]],
             "publish": True,
-            "comments": [{"internal": True, "text": "QA ok; publishing it"}],
+            "comments": [{"internal": True, "text": "This revision has passed QA."}],
         }
     elif action == "fail-qa":
+        response = session.delete(
+            endpoints["revisions"]["undo"],
+        )
+        response.raise_for_status()
         return {
-            "tags": [],
+            "tags": revision_tags,
             "publish": False,
-            "comments": [{"internal": True, "text": "QA failed; unpublishing it"}],
+            "comments": [{"internal": True, "text": "This revision has failed QA."}],
         }
     return {}

@@ -335,6 +335,7 @@ def custom_revision_action(
     revision,
     user,
     action,
+    endpoints,
 ):
     """Trigger a custom action for a revision
     ---
@@ -361,7 +362,7 @@ def custom_revision_action(
                 items: ServiceActionResultSchema
     """
 
-    resp = process_custom_action(event, revision, action, user)
+    resp = process_custom_action(event, revision, action, user, endpoints)
     return jsonify(ServiceActionResultSchema().dump(resp))
 
 
