@@ -81,7 +81,7 @@ class EditingUserSchema(Schema):
     id = fields.Integer(required=True)
     full_name = fields.String(required=True)
     identifier = fields.String(required=True)
-    avatar_bg_color = fields.String()
+    avatar_url = fields.String()
 
 
 class EditableSchema(Schema):

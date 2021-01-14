@@ -54,7 +54,7 @@ components:
       type: object
     EditingUser:
       properties:
-        avatar_bg_color:
+        avatar_url:
           type: string
         full_name:
           type: string
