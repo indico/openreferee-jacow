@@ -128,9 +128,12 @@ components:
           type: string
         replace:
           type: string
+        undo:
+          type: string
       required:
       - details
       - replace
+      - undo
       type: object
     ListEndpoint:
       properties:
@@ -289,12 +292,15 @@ components:
       properties:
         action:
           type: string
+        endpoints:
+          $ref: '#/components/schemas/EditableEndpoints'
         revision:
           $ref: '#/components/schemas/Revision'
         user:
           $ref: '#/components/schemas/User'
       required:
       - action
+      - endpoints
       - revision
       - user
       type: object
