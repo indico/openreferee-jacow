@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 from collections import defaultdict
@@ -101,20 +102,24 @@ def cleanup_event(event):
     cleanup_file_types(session, event)
 
 
-def process_editable_files(session, event, files, endpoints):
-    available_tags = get_event_tags(session, event)
+def process_editable_files(session, files, upload_endpoint):
     uploaded = defaultdict(list)
     for file in files:
         if os.path.splitext(file["filename"])[1] != ".pdf":
             uploaded[file["file_type"]].append(file["uuid"])
             continue
-        upload = process_pdf(file, session, endpoints["file_upload"])
+        upload = process_pdf(file, session, upload_endpoint)
         uploaded[file["file_type"]].append(upload["uuid"])
 
+    return uploaded
+
+
+def replace_revision(session, event, files, replace_endpoint):
+    available_tags = get_event_tags(session, event)
     response = session.post(
-        endpoints["revisions"]["replace"],
+        replace_endpoint,
         json={
-            "files": uploaded,
+            "files": files,
             "state": "ready_for_review",
             "comment": "The PDFs in this review have been distilled.",
             "tags": [available_tags[Tag.PROCESSED]["id"]],

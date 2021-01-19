@@ -27,7 +27,7 @@ from .operations import (
     process_editable_files,
     setup_event_tags,
     setup_file_types,
-    setup_requests_session,
+    setup_requests_session, replace_revision,
 )
 from .schemas import (
     CreateEditableSchema,
@@ -220,20 +220,21 @@ def create_editable(
         "A new %r editable was submitted for contribution %r", editable_type, contrib_id
     )
     session = setup_requests_session(event.token)
+    new_files = process_editable_files(session, revision["files"], endpoints["file_upload"])
 
     @copy_current_request_context
-    def watermark_revision_files():
+    def replace_revision_files():
         """Wait until the revision has been committed"""
         response = session.get(endpoints["revisions"]["details"])
         if response.status_code == 200:
-            process_editable_files(session, event, revision["files"], endpoints)
+            replace_revision(session, event, new_files, endpoints["revisions"]["replace"])
             return
 
-        t = threading.Timer(5.0, watermark_revision_files)
+        t = threading.Timer(5.0, replace_revision_files)
         t.daemon = True
         t.start()
 
-    watermark_revision_files()
+    replace_revision_files()
     return "", 201
 
 
