@@ -17,7 +17,7 @@ from werkzeug.exceptions import Conflict, NotFound, Unauthorized
 
 from .app import register_spec
 from .db import db
-from .defaults import DEFAULT_EDITABLES, SERVICE_INFO
+from .defaults import DEFAULT_EDITABLES, PROCESS_EDITABLE_FILES, SERVICE_INFO
 from .models import Event
 from .operations import (
     cleanup_event,
@@ -25,11 +25,13 @@ from .operations import (
     process_accepted_revision,
     process_custom_action,
     process_editable_files,
+    replace_revision,
     setup_event_tags,
     setup_file_types,
-    setup_requests_session, replace_revision,
+    setup_requests_session,
 )
 from .schemas import (
+    CreateEditableResponseSchema,
     CreateEditableSchema,
     EventInfoSchema,
     EventSchema,
@@ -215,7 +217,13 @@ def create_editable(
       responses:
         200:
           description: Editable processed
+          content:
+            application/json:
+              schema: CreateEditableResponseSchema
     """
+    resp = {'ready_for_review': not PROCESS_EDITABLE_FILES}
+    if not PROCESS_EDITABLE_FILES:
+        return CreateEditableResponseSchema().dump(resp), 201
     current_app.logger.info(
         "A new %r editable was submitted for contribution %r", editable_type, contrib_id
     )
@@ -235,7 +243,7 @@ def create_editable(
         t.start()
 
     replace_revision_files()
-    return "", 201
+    return CreateEditableResponseSchema().dump(resp), 201
 
 
 @api.route(
