@@ -134,6 +134,10 @@ class CreateEditableSchema(Schema):
     user = fields.Nested(UserSchema, required=True)
 
 
+class CreateEditableResponseSchema(Schema):
+    ready_for_review = fields.Boolean(load_default=False)
+
+
 class ReviewEditableSchema(Schema):
     action = fields.String(required=True)
     revision = fields.Nested(TransientRevisionSchema, unknown=EXCLUDE, required=True)
