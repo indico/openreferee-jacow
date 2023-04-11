@@ -1,0 +1,19 @@
+# Editors
+*.swp
+.idea/
+.vscode/
+
+# Python
+dist/
+.venv/
+__pycache__/
+*.py[co]
+*.egg-info
+*.whl
+build/
+.cache/
+pip-wheel-metadata/
+node_modules
+
+# Generated files
+specs/openreferee.test.json
