@@ -221,21 +221,25 @@ def create_editable(
             application/json:
               schema: CreateEditableResponseSchema
     """
-    resp = {'ready_for_review': not PROCESS_EDITABLE_FILES}
+    resp = {"ready_for_review": not PROCESS_EDITABLE_FILES}
     if not PROCESS_EDITABLE_FILES:
         return CreateEditableResponseSchema().dump(resp), 201
     current_app.logger.info(
         "A new %r editable was submitted for contribution %r", editable_type, contrib_id
     )
     session = setup_requests_session(event.token)
-    new_files = process_editable_files(session, revision["files"], endpoints["file_upload"])
+    new_files = process_editable_files(
+        session, revision["files"], endpoints["file_upload"]
+    )
 
     @copy_current_request_context
     def replace_revision_files():
         """Wait until the revision has been committed"""
         response = session.get(endpoints["revisions"]["details"])
         if response.status_code == 200:
-            replace_revision(session, event, new_files, endpoints["revisions"]["replace"])
+            replace_revision(
+                session, event, new_files, endpoints["revisions"]["replace"]
+            )
             return
 
         t = threading.Timer(5.0, replace_revision_files)
