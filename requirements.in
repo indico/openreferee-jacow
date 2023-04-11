@@ -1,0 +1,10 @@
+apispec-webframeworks
+apispec[yaml]
+flask
+flask-sqlalchemy
+psycopg2
+pypdf2
+requests
+sqlalchemy[postgresql]
+webargs
+werkzeug

@@ -1,0 +1,9 @@
+black
+flake8
+flask-cors
+flask-shell-ipython
+ipython
+isort
+pip-tools
+python-dotenv
+wheel
