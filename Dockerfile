@@ -3,33 +3,32 @@ FROM python:3.11 AS builder
 ADD . /build/
 WORKDIR /build
 
-RUN pip install -q -e '.[dev]'
-RUN python setup.py bdist_wheel -q
+RUN set -ex && \
+	pip install -q -U pip wheel && \
+	pip install -q -e '.[dev]'
+RUN python -m build --wheel --outdir dist
 
 
 FROM python:3.11
 
-# Install necessary dependencies
-RUN apt-get update -y
-RUN apt-get upgrade -y
-# Install a new package, without unnecessary recommended packages
-RUN apt-get install -y --no-install-recommends ghostscript
-# Delete cached files we don't need anymore
-RUN apt-get clean
-CMD ["rm", "-rf", "/var/lib/apt/lists/*"]
+RUN set -ex && \
+	apt-get -y update && \
+	apt-get -y install --no-install-recommends ghostscript && \
+	apt-get -y clean && \
+	rm -rf /var/lib/apt/lists/*
 
 # create an unprivileged user to run as
 RUN set -ex && \
 	groupadd -r openreferee && \
 	useradd -r -g openreferee -m -d /openreferee openreferee
 
-RUN pip install uwsgi
+RUN pip install -U pip setuptools wheel uwsgi
 COPY --from=builder /build/dist/openreferee*.whl /tmp/
 RUN pip install $(echo /tmp/openreferee*.whl)
 ADD docker/run.sh docker/uwsgi.ini /
 
 USER openreferee
 
-ENV FLASK_ENV=production FLASK_APP=openreferee_server.wsgi
+ENV FLASK_APP=openreferee_server.wsgi
 CMD ["/run.sh"]
 EXPOSE 8080
