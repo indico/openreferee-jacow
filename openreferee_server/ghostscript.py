@@ -1,7 +1,6 @@
 import subprocess
 import sys
 
-
 gs = "gswin32c" if (sys.platform == "win32") else "gs"
 
 """

@@ -9,7 +9,6 @@ from werkzeug.exceptions import HTTPException, UnprocessableEntity
 from . import __version__
 from .db import db, register_db_cli
 
-
 try:
     from flask_cors import CORS
 except ImportError:
