@@ -84,3 +84,4 @@ CUSTOM_ACTIONS = [
     {"name": "approve-qa", "title": "Approve QA", "color": "teal", "icon": "check"},
 ]
 PROCESS_EDITABLE_FILES = False
+PUBLISH_AFTER_QA = False

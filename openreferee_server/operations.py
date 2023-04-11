@@ -12,6 +12,7 @@ from .defaults import (
     DEFAULT_EDITABLES,
     DEFAULT_FILE_TYPES,
     DEFAULT_TAGS,
+    PUBLISH_AFTER_QA,
     Tag,
 )
 
@@ -205,7 +206,7 @@ def process_custom_action(event, revision, action, user, endpoints):
     if action == "approve-qa":
         return {
             "tags": revision_tags + [available_tags[Tag.QA_APPROVED]["id"]],
-            "publish": True,
+            "publish": PUBLISH_AFTER_QA,
             "comments": [{"internal": True, "text": "This revision has passed QA."}],
         }
     elif action == "fail-qa":
