@@ -191,7 +191,7 @@ def get_event_info(event):
 
 
 @api.route(
-    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>",
+    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>",  # noqa: E501
     methods=("PUT",),
 )
 @use_kwargs(CreateEditableSchema, location="json")
@@ -251,7 +251,7 @@ def create_editable(
 
 
 @api.route(
-    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>",
+    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>",  # noqa: E501
     methods=("POST",),
 )
 @use_kwargs(ReviewEditableSchema(unknown=EXCLUDE), location="json")
@@ -292,7 +292,7 @@ def review_editable(
 
 
 @api.route(
-    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/actions",
+    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/actions",  # noqa: E501
     methods=("POST",),
 )
 @use_kwargs(ServiceActionsRequestSchema(unknown=EXCLUDE), location="json")
@@ -335,7 +335,7 @@ def get_custom_revision_actions(
 
 
 @api.route(
-    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/action",
+    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/action",  # noqa: E501
     methods=("POST",),
 )
 @use_kwargs(ServiceTriggerActionRequestSchema(unknown=EXCLUDE), location="json")

@@ -1,4 +1,3 @@
-import json
 import os
 import tempfile
 from collections import defaultdict
@@ -130,7 +129,10 @@ def replace_revision(session, event, files, replace_endpoint):
 
 def process_pdf(file, session, upload_endpoint):
     _dir = os.path.dirname(__file__)
-    with tempfile.NamedTemporaryFile() as out_file, tempfile.NamedTemporaryFile() as in_file:
+    with (
+        tempfile.NamedTemporaryFile() as out_file,
+        tempfile.NamedTemporaryFile() as in_file,
+    ):
         resp = session.get(file["signed_download_url"])
         in_file.write(resp.content)
         in_file.seek(0)

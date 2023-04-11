@@ -3,8 +3,7 @@
   "private": true,
   "scripts": {
     "isort": "isort setup.py openreferee_server/",
-    "black": "black setup.py openreferee_server/",
-    "pycodestyle": "pycodestyle openreferee_server/",
+    "black": "black -t setup.py openreferee_server/",
     "flake8": "flake8 openreferee_server/",
     "api-spec": "flask openapi | sed -e :a -e '/^\\n*$/{$d;N;};/\\n$/ba' > specs/openreferee.yaml",
     "api-spec-test": "flask openapi --json --test -h localhost -p 12345 > specs/openreferee.test.json",
