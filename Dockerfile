@@ -1,4 +1,4 @@
-FROM python:3.8 AS builder
+FROM python:3.11 AS builder
 
 ADD . /build/
 WORKDIR /build
@@ -7,7 +7,7 @@ RUN pip install -q -e '.[dev]'
 RUN python setup.py bdist_wheel -q
 
 
-FROM python:3.8
+FROM python:3.11
 
 # Install necessary dependencies
 RUN apt-get update -y
