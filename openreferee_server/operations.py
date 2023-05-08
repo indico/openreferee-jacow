@@ -210,8 +210,8 @@ def process_custom_action(event, revision, action, user, endpoints):
             "comments": [{"internal": True, "text": "This revision has passed QA."}],
         }
     elif action == "fail-qa":
-        response = session.delete(
-            endpoints["revisions"]["undo"],
+        response = session.post(
+            endpoints["revisions"]["reset"],
         )
         response.raise_for_status()
         return {

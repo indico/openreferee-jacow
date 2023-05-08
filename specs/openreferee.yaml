@@ -467,12 +467,15 @@ components:
           type: string
         undo:
           type: string
+        reset:
+          type: string
         details:
           type: string
       required:
       - details
       - replace
       - undo
+      - reset
     EditableEndpoints:
       type: object
       properties:

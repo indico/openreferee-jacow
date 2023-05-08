@@ -25,6 +25,7 @@ class EditableEndpointsSchema(Schema):
             "details": fields.String(required=True),
             "replace": fields.String(required=True),
             "undo": fields.String(required=True),
+            "reset": fields.String(required=True),
         }
     )
     file_upload = fields.String(required=True)
