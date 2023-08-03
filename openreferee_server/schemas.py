@@ -73,7 +73,7 @@ class TagSchema(Schema):
     url = fields.String()
 
 
-class RevisionStateSchema(Schema):
+class RevisionTypeSchema(Schema):
     name = fields.String(required=True)
     title = fields.String(allow_none=True)
     css_class = fields.String(allow_none=True)
@@ -97,10 +97,8 @@ class EditableSchema(Schema):
 
 class _BaseRevisionSchema(Schema):
     comment = fields.String(required=True)
-    submitter = fields.Nested(EditingUserSchema, required=True)
-    editor = fields.Nested(EditingUserSchema, allow_none=True)
-    initial_state = fields.Nested(RevisionStateSchema)
-    final_state = fields.Nested(RevisionStateSchema)
+    user = fields.Nested(EditingUserSchema, required=True)
+    type = fields.Nested(RevisionTypeSchema)
     tags = fields.List(fields.Nested(TagSchema))
 
 

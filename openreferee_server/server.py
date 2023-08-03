@@ -285,7 +285,7 @@ def review_editable(
         "A new revision %r was submitted for contribution %r", revision_id, contrib_id
     )
     resp = {}
-    if revision["final_state"]["name"] == "accepted":
+    if action == "accept":
         resp = process_accepted_revision(event, revision)
 
     return ReviewResponseSchema().dump(resp), 201

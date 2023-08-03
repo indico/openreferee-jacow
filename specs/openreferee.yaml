@@ -43,10 +43,10 @@ paths:
       parameters:
       - in: path
         name: identifier
+        required: true
         description: The unique ID which represents the event
         schema:
           type: string
-        required: true
       responses:
         '201':
           description: Event Created
@@ -65,10 +65,10 @@ paths:
       parameters:
       - in: path
         name: identifier
+        required: true
         description: The unique ID which represents the event
         schema:
           type: string
-        required: true
       responses:
         '204':
           description: Event Removed
@@ -87,10 +87,10 @@ paths:
       parameters:
       - in: path
         name: identifier
+        required: true
         description: The unique ID which represents the event
         schema:
           type: string
-        required: true
       responses:
         '200':
           description: Event Info
@@ -115,22 +115,22 @@ paths:
       parameters:
       - in: path
         name: identifier
+        required: true
         description: The unique ID which represents the event
         schema:
           type: string
-        required: true
       - in: path
         name: contrib_id
+        required: true
         description: The unique ID which represents the contribution
         schema:
           type: integer
-        required: true
       - in: path
         name: editable_type
+        required: true
         description: The name which represents the editable type
         schema:
           type: string
-        required: true
       responses:
         '200':
           description: Editable processed
@@ -155,28 +155,28 @@ paths:
       parameters:
       - in: path
         name: identifier
+        required: true
         description: The unique ID which represents the event
         schema:
           type: string
-        required: true
       - in: path
         name: contrib_id
+        required: true
         description: The unique ID which represents the contribution
         schema:
           type: integer
-        required: true
       - in: path
         name: editable_type
+        required: true
         description: The name which represents the editable type
         schema:
           type: string
-        required: true
       - in: path
         name: revision_id
+        required: true
         description: The unique ID which represents the revision
         schema:
           type: string
-        required: true
       responses:
         '200':
           description: Review processed
@@ -201,28 +201,28 @@ paths:
       parameters:
       - in: path
         name: identifier
+        required: true
         description: The unique ID which represents the event
         schema:
           type: string
-        required: true
       - in: path
         name: contrib_id
+        required: true
         description: The unique ID which represents the contribution
         schema:
           type: integer
-        required: true
       - in: path
         name: editable_type
+        required: true
         description: The name which represents the editable type
         schema:
           type: string
-        required: true
       - in: path
         name: revision_id
+        required: true
         description: The unique ID which represents the revision
         schema:
           type: string
-        required: true
       responses:
         '200':
           description: List of available actions
@@ -249,28 +249,28 @@ paths:
       parameters:
       - in: path
         name: identifier
+        required: true
         description: The unique ID which represents the event
         schema:
           type: string
-        required: true
       - in: path
         name: contrib_id
+        required: true
         description: The unique ID which represents the contribution
         schema:
           type: integer
-        required: true
       - in: path
         name: editable_type
+        required: true
         description: The name which represents the editable type
         schema:
           type: string
-        required: true
       - in: path
         name: revision_id
+        required: true
         description: The unique ID which represents the revision
         schema:
           type: string
-        required: true
       responses:
         '200':
           description: List of available actions
@@ -286,9 +286,9 @@ components:
     ServiceInfo:
       type: object
       properties:
-        version:
-          type: string
         name:
+          type: string
+        version:
           type: string
       required:
       - name
@@ -296,9 +296,9 @@ components:
     ListEndpoint:
       type: object
       properties:
-        create:
-          type: string
         list:
+          type: string
+        create:
           type: string
       required:
       - create
@@ -323,12 +323,12 @@ components:
         url:
           type: string
           format: url
-        endpoints:
-          $ref: '#/components/schemas/EventEndpoints'
-        token:
-          type: string
         title:
           type: string
+        token:
+          type: string
+        endpoints:
+          $ref: '#/components/schemas/EventEndpoints'
       required:
       - endpoints
       - title
@@ -344,9 +344,9 @@ components:
     EventInfoService:
       type: object
       properties:
-        version:
-          type: string
         name:
+          type: string
+        version:
           type: string
     EventInfo:
       type: object
@@ -354,48 +354,17 @@ components:
         url:
           type: string
           format: url
-        service:
-          $ref: '#/components/schemas/EventInfoService'
-        can_disconnect:
-          type: boolean
         title:
           type: string
+        can_disconnect:
+          type: boolean
+        service:
+          $ref: '#/components/schemas/EventInfoService'
       required:
       - can_disconnect
       - service
       - title
       - url
-    RevisionState:
-      type: object
-      properties:
-        css_class:
-          type: string
-          nullable: true
-        title:
-          type: string
-          nullable: true
-        name:
-          type: string
-      required:
-      - name
-    SignedFile:
-      type: object
-      properties:
-        filename:
-          type: string
-        content_type:
-          type: string
-        uuid:
-          type: string
-        signed_download_url:
-          type: string
-        file_type:
-          type: integer
-      required:
-      - file_type
-      - filename
-      - signed_download_url
-      - uuid
     EditingUser:
       type: object
       properties:
@@ -403,88 +372,14 @@ components:
           type: string
         full_name:
           type: string
-        identifier:
-          type: string
         id:
           type: integer
+        identifier:
+          type: string
       required:
       - full_name
       - id
       - identifier
-    Tag:
-      type: object
-      properties:
-        code:
-          type: string
-        color:
-          type: string
-        title:
-          type: string
-        verbose_title:
-          type: string
-        url:
-          type: string
-        is_used_in_revision:
-          type: boolean
-        id:
-          type: integer
-        system:
-          type: boolean
-      required:
-      - code
-      - id
-      - title
-    Revision:
-      type: object
-      properties:
-        initial_state:
-          $ref: '#/components/schemas/RevisionState'
-        files:
-          type: array
-          items:
-            $ref: '#/components/schemas/SignedFile'
-        final_state:
-          $ref: '#/components/schemas/RevisionState'
-        submitter:
-          $ref: '#/components/schemas/EditingUser'
-        editor:
-          nullable: true
-          allOf:
-          - $ref: '#/components/schemas/EditingUser'
-        comment:
-          type: string
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/Tag'
-      required:
-      - comment
-      - submitter
-    Generated:
-      type: object
-      properties:
-        replace:
-          type: string
-        undo:
-          type: string
-        reset:
-          type: string
-        details:
-          type: string
-      required:
-      - details
-      - replace
-      - undo
-      - reset
-    EditableEndpoints:
-      type: object
-      properties:
-        file_upload:
-          type: string
-        revisions:
-          $ref: '#/components/schemas/Generated'
-      required:
-      - file_upload
     Editable:
       type: object
       properties:
@@ -492,16 +387,16 @@ components:
           type: string
         type:
           type: string
-        timeline_url:
-          type: string
-        revision_count:
-          type: integer
-        id:
-          type: integer
         editor:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/EditingUser'
+        id:
+          type: integer
+        timeline_url:
+          type: string
+        revision_count:
+          type: integer
       required:
       - id
       - state
@@ -520,22 +415,22 @@ components:
     User:
       type: object
       properties:
+        submitter:
+          type: boolean
+        full_name:
+          type: string
+        editor:
+          type: boolean
+        id:
+          type: integer
+        manager:
+          type: boolean
+        email:
+          type: string
         roles:
           type: array
           items:
             $ref: '#/components/schemas/Role'
-        full_name:
-          type: string
-        email:
-          type: string
-        submitter:
-          type: boolean
-        manager:
-          type: boolean
-        id:
-          type: integer
-        editor:
-          type: boolean
       required:
       - editor
       - email
@@ -544,17 +439,116 @@ components:
       - manager
       - roles
       - submitter
+    RevisionType:
+      type: object
+      properties:
+        title:
+          type: string
+          nullable: true
+        name:
+          type: string
+        css_class:
+          type: string
+          nullable: true
+      required:
+      - name
+    SignedFile:
+      type: object
+      properties:
+        filename:
+          type: string
+        uuid:
+          type: string
+        file_type:
+          type: integer
+        signed_download_url:
+          type: string
+        content_type:
+          type: string
+      required:
+      - file_type
+      - filename
+      - signed_download_url
+      - uuid
+    Tag:
+      type: object
+      properties:
+        is_used_in_revision:
+          type: boolean
+        code:
+          type: string
+        id:
+          type: integer
+        color:
+          type: string
+        url:
+          type: string
+        title:
+          type: string
+        verbose_title:
+          type: string
+        system:
+          type: boolean
+      required:
+      - code
+      - id
+      - title
+    Revision:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/RevisionType'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/SignedFile'
+        comment:
+          type: string
+        user:
+          $ref: '#/components/schemas/EditingUser'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+      required:
+      - comment
+      - user
+    Generated:
+      type: object
+      properties:
+        undo:
+          type: string
+        replace:
+          type: string
+        reset:
+          type: string
+        details:
+          type: string
+      required:
+      - details
+      - replace
+      - reset
+      - undo
+    EditableEndpoints:
+      type: object
+      properties:
+        file_upload:
+          type: string
+        revisions:
+          $ref: '#/components/schemas/Generated'
+      required:
+      - file_upload
     CreateEditable:
       type: object
       properties:
-        revision:
-          $ref: '#/components/schemas/Revision'
-        endpoints:
-          $ref: '#/components/schemas/EditableEndpoints'
         editable:
           $ref: '#/components/schemas/Editable'
         user:
           $ref: '#/components/schemas/User'
+        revision:
+          $ref: '#/components/schemas/Revision'
+        endpoints:
+          $ref: '#/components/schemas/EditableEndpoints'
       required:
       - editable
       - endpoints
@@ -569,40 +563,34 @@ components:
     TransientRevision:
       type: object
       properties:
-        initial_state:
-          $ref: '#/components/schemas/RevisionState'
+        type:
+          $ref: '#/components/schemas/RevisionType'
         files:
           type: array
           items:
             $ref: '#/components/schemas/SignedFile'
-        final_state:
-          $ref: '#/components/schemas/RevisionState'
-        submitter:
-          $ref: '#/components/schemas/EditingUser'
-        editor:
-          nullable: true
-          allOf:
-          - $ref: '#/components/schemas/EditingUser'
         comment:
           type: string
+        user:
+          $ref: '#/components/schemas/EditingUser'
         tags:
           type: array
           items:
             $ref: '#/components/schemas/Tag'
       required:
       - comment
-      - submitter
+      - user
     ReviewEditable:
       type: object
       properties:
+        user:
+          $ref: '#/components/schemas/User'
         revision:
           $ref: '#/components/schemas/TransientRevision'
         action:
           type: string
         endpoints:
           $ref: '#/components/schemas/EditableEndpoints'
-        user:
-          $ref: '#/components/schemas/User'
       required:
       - action
       - endpoints
@@ -611,21 +599,21 @@ components:
     Comment:
       type: object
       properties:
-        internal:
-          type: boolean
         text:
           type: string
+        internal:
+          type: boolean
     ReviewResponse:
       type: object
       properties:
-        publish:
-          type: boolean
         comments:
           type: array
           items:
             $ref: '#/components/schemas/Comment'
         comment:
           type: string
+        publish:
+          type: boolean
         tags:
           type: array
           items:
@@ -643,34 +631,34 @@ components:
     ServiceAction:
       type: object
       properties:
-        color:
+        confirm:
           type: string
           default: null
           nullable: true
-        title:
-          type: string
         name:
           type: string
         icon:
           type: string
           default: null
           nullable: true
-        confirm:
+        color:
           type: string
           default: null
           nullable: true
+        title:
+          type: string
       required:
       - name
       - title
     ServiceTriggerActionRequest:
       type: object
       properties:
+        endpoints:
+          $ref: '#/components/schemas/EditableEndpoints'
         revision:
           $ref: '#/components/schemas/Revision'
         action:
           type: string
-        endpoints:
-          $ref: '#/components/schemas/EditableEndpoints'
         user:
           $ref: '#/components/schemas/User'
       required:
@@ -681,6 +669,10 @@ components:
     ServiceActionResult:
       type: object
       properties:
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
         redirect:
           type: string
           default: null
@@ -689,10 +681,6 @@ components:
           type: boolean
           default: null
           nullable: true
-        comments:
-          type: array
-          items:
-            $ref: '#/components/schemas/Comment'
         tags:
           type: array
           items:
