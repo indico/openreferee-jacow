@@ -291,6 +291,31 @@ def review_editable(
     return ReviewResponseSchema().dump(resp), 201
 
 
+@api.route("/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>", methods=("DELETE",))
+@require_event_token
+def remove_editable(event, contrib_id, editable_type):
+    """Remove an editable.
+    ---
+    delete:
+      description: Remove an editable
+      operationId: removeEditable
+      tags: ["editable", "remove"]
+      security:
+        - bearer_token: []
+      parameters:
+        - in: path
+          schema: IdentifierParameter
+      responses:
+        204:
+          description: Editable Removed
+          content:
+            application/json:
+              schema: SuccessSchema
+    """
+    # no actions are needed here
+    return "", 204
+
+
 @api.route(
     "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/actions",  # noqa: E501
     methods=("POST",),
