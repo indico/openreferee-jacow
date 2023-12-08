@@ -1,6 +1,7 @@
 import json
+import logging
 import threading
-
+from requests.exceptions import HTTPError, ConnectionError, Timeout, RequestException
 from .operations import setup_requests_session
 
 
@@ -12,12 +13,18 @@ class NotifyService:
 
     def send(self, payload):
         try:
-            self.session.get(self.url, data=json.dumps({"payload": payload}))
-        except Exception:
-            pass
+            self.session.post(self.url, data=json.dumps({"payload": payload}))
+        except HTTPError as e:
+            logging.error("Invalid response from notify: %s", str(e), exc_info=True)
+        except ConnectionError as e:
+            logging.error("Could not connect to notify server: %s", str(e), exc_info=True)
+        except Timeout as e:
+            logging.error("Notify server timed out: %s", str(e), exc_info=True)
+        except RequestException as e:
+            logging.error("Failed to send notify payload %s", str(e), exc_info=True)
 
     def notify(self, payload):
-        if self.url is None:
+        if self.url is None or self.url == '':
             return
 
         if self.session is None:
@@ -37,9 +44,8 @@ class NotifyExtension:
     def init_app(self, context):
         context.config.setdefault('NOTIFY_URL', self.url)
         context.config.setdefault('NOTIFY_TOKEN', self.token)
-
-        self.service = NotifyService(context.config['NOTIFY_URL'], context.config['NOTIFY_TOKEN'])
-        if not hasattr(context, 'extensions'):
-            context.extensions = {}
-
+        self.service = NotifyService(
+            context.config['NOTIFY_URL'],
+            context.config['NOTIFY_TOKEN']
+        )
         context.extensions['notifier'] = self.service

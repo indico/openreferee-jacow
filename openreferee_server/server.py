@@ -17,7 +17,6 @@ from werkzeug.exceptions import Conflict, NotFound, Unauthorized
 
 from .app import register_spec
 from .db import db
-from .notify import NotifyService
 from .defaults import DEFAULT_EDITABLES, PROCESS_EDITABLE_FILES, SERVICE_INFO
 from .models import Event
 from .operations import (
@@ -45,8 +44,10 @@ from .schemas import (
 )
 
 
-def get_notifier(context) -> NotifyService:
-    return context.extensions.get('notifier')
+def notify(context, payload):
+    service = context.extensions.get('notifier')
+    if service is not None:
+        service.notify(payload)
 
 
 def require_event_token(fn):
@@ -291,7 +292,7 @@ def review_editable(
     )
     resp = {}
 
-    get_notifier(current_app).notify({
+    notify(current_app, {
         "event": event.identifier,
         "contrib_id": contrib_id,
         "revision_id": revision_id,
@@ -333,7 +334,7 @@ def remove_editable(event, contrib_id, editable_type):
 
 
 @api.route(
-    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/actions",  # noqa: E501
+    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/actions",
     methods=("POST",),
 )
 @use_kwargs(ServiceActionsRequestSchema(unknown=EXCLUDE), location="json")
@@ -376,7 +377,7 @@ def get_custom_revision_actions(
 
 
 @api.route(
-    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/action",  # noqa: E501
+    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/action",
     methods=("POST",),
 )
 @use_kwargs(ServiceTriggerActionRequestSchema(unknown=EXCLUDE), location="json")
