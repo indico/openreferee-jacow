@@ -17,6 +17,7 @@ from werkzeug.exceptions import Conflict, NotFound, Unauthorized
 
 from .app import register_spec
 from .db import db
+from .notify import NotifyService
 from .defaults import DEFAULT_EDITABLES, PROCESS_EDITABLE_FILES, SERVICE_INFO
 from .models import Event
 from .operations import (
@@ -42,6 +43,10 @@ from .schemas import (
     ServiceActionsRequestSchema,
     ServiceTriggerActionRequestSchema,
 )
+
+
+def get_notifier(context) -> NotifyService:
+    return context.extensions.get('notifier')
 
 
 def require_event_token(fn):
@@ -285,6 +290,17 @@ def review_editable(
         "A new revision %r was submitted for contribution %r", revision_id, contrib_id
     )
     resp = {}
+
+    get_notifier(current_app).notify({
+        "event": event.identifier,
+        "contrib_id": contrib_id,
+        "revision_id": revision_id,
+        "action": action,
+        "editable_type": editable_type,
+        "user": user,
+        "request": request.json
+    })
+
     if action == "accept":
         resp = process_accepted_revision(event, revision)
 

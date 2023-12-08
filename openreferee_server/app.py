@@ -5,7 +5,7 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_webframeworks.flask import FlaskPlugin
 from flask import Flask, jsonify
 from werkzeug.exceptions import HTTPException, UnprocessableEntity
-
+from .notify import NotifyExtension
 from . import __version__
 from .db import db, register_db_cli
 
@@ -26,6 +26,7 @@ def create_app():
     register_error_handlers(app)
     db.init_app(app)
     register_db_cli(app)
+    NotifyExtension(app, os.environ.get('NOTIFY_URL'), os.environ.get('NOTIFY_TOKEN'))
     app.register_blueprint(api)
     return app
 
