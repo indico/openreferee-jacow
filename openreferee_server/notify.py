@@ -29,7 +29,7 @@ class NotifyService:
             self.log_error("Failed to send notify payload %s", str(e))
 
     def notify(self, payload):
-        if self.url is None or self.url == '':
+        if self.url in [None, '']:
             return
 
         if self.session is None:
@@ -38,28 +38,21 @@ class NotifyService:
         threading.Thread(target=self.send, args=(payload,)).start()
 
 
-class NotifyExtension:
-    def __init__(self, context=None, notify_url=None, notify_token=None):
-        self.url = notify_url
-        self.token = notify_token
-        self.service = None
-        if context is not None:
-            self.init_app(context)
+def notify_init(app, url, token):
+    app.config.setdefault('NOTIFY_URL', url)
+    app.config.setdefault('NOTIFY_TOKEN', token)
 
-    def init_app(self, app):
-        app.config.setdefault('NOTIFY_URL', self.url)
-        app.config.setdefault('NOTIFY_TOKEN', self.token)
+    if app.config['NOTIFY_URL'] not in [None, '']:
+        app.logger.info("Enabling notifications to URL %s", app.config['NOTIFY_URL'])
+        app.logger.info("Token found: %s", app.config['NOTIFY_TOKEN'] is not None)
 
-        if app.config['NOTIFY_URL'] not in [None, '']:
-            app.logger.info("Enabling notifications to URL %s", app.config['NOTIFY_URL'])
-            app.logger.info("Token found: %s", app.config['NOTIFY_TOKEN'] is not None)
+        app.extensions['notifier'] = NotifyService(
+            app.config['NOTIFY_URL'],
+            app.config['NOTIFY_TOKEN'],
+            app.logger,
+        )
+    else:
+        app.logger.warn("Skipping notifications, NOTIFY_URL missing in .env")
 
-            self.service = NotifyService(
-                app.config['NOTIFY_URL'],
-                app.config['NOTIFY_TOKEN'],
-                app.logger,
-            )
-            app.extensions['notifier'] = self.service
-        else:
-            app.logger.warn("Skipping notifications, NOTIFY_URL missing in .env")
+
 
