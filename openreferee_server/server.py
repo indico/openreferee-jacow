@@ -44,8 +44,8 @@ from .schemas import (
 )
 
 
-def notify(context, payload):
-    service = context.extensions.get('notifier')
+def notify(app, payload):
+    service = app.extensions.get('notifier')
     if service is not None:
         service.notify(payload)
 
