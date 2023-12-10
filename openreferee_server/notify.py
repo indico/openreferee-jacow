@@ -6,22 +6,27 @@ from .operations import setup_requests_session
 
 
 class NotifyService:
-    def __init__(self, url=None, token=None) -> None:
+    def __init__(self, url=None, token=None, logger=None) -> None:
         self.url = url
         self.token = token
+        self.logger = logger
         self.session = None
+
+    def log_error(self, *args) -> logging.Logger:
+        if self.logger is not None:
+            return self.logger.error(*args)
 
     def send(self, payload):
         try:
             self.session.post(self.url, data=json.dumps({"payload": payload}))
         except HTTPError as e:
-            logging.error("Invalid response from notify: %s", str(e), exc_info=True)
+            self.log_error("Invalid response from notify: %s", str(e))
         except ConnectionError as e:
-            logging.error("Could not connect to notify server: %s", str(e), exc_info=True)
+            self.log_error("Could not connect to notify server: %s", str(e))
         except Timeout as e:
-            logging.error("Notify server timed out: %s", str(e), exc_info=True)
+            self.log_error("Notify server timed out: %s", str(e))
         except RequestException as e:
-            logging.error("Failed to send notify payload %s", str(e), exc_info=True)
+            self.log_error("Failed to send notify payload %s", str(e))
 
     def notify(self, payload):
         if self.url is None or self.url == '':
@@ -41,11 +46,20 @@ class NotifyExtension:
         if context is not None:
             self.init_app(context)
 
-    def init_app(self, context):
-        context.config.setdefault('NOTIFY_URL', self.url)
-        context.config.setdefault('NOTIFY_TOKEN', self.token)
-        self.service = NotifyService(
-            context.config['NOTIFY_URL'],
-            context.config['NOTIFY_TOKEN']
-        )
-        context.extensions['notifier'] = self.service
+    def init_app(self, app):
+        app.config.setdefault('NOTIFY_URL', self.url)
+        app.config.setdefault('NOTIFY_TOKEN', self.token)
+
+        if app.config['NOTIFY_URL'] not in [None, '']:
+            app.logger.info("Enabling notifications to URL %s", app.config['NOTIFY_URL'])
+            app.logger.info("Token found: %s", app.config['NOTIFY_TOKEN'] is not None)
+
+            self.service = NotifyService(
+                app.config['NOTIFY_URL'],
+                app.config['NOTIFY_TOKEN'],
+                app.logger,
+            )
+            app.extensions['notifier'] = self.service
+        else:
+            app.logger.warn("Skipping notifications, NOTIFY_URL missing in .env")
+
