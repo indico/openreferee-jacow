@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import threading
 from requests.exceptions import HTTPError, ConnectionError, Timeout, RequestException
 from .operations import setup_requests_session
@@ -38,9 +39,9 @@ class NotifyService:
         threading.Thread(target=self.send, args=(payload,)).start()
 
 
-def notify_init(app, url, token):
-    app.config.setdefault('NOTIFY_URL', url)
-    app.config.setdefault('NOTIFY_TOKEN', token)
+def notify_init(app):
+    app.config.setdefault('NOTIFY_URL', os.environ.get('NOTIFY_URL'))
+    app.config.setdefault('NOTIFY_TOKEN', os.environ.get('NOTIFY_TOKEN'))
 
     if app.config['NOTIFY_URL'] not in [None, '']:
         app.logger.info("Enabling notifications to URL %s", app.config['NOTIFY_URL'])

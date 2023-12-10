@@ -26,7 +26,7 @@ def create_app():
     register_error_handlers(app)
     db.init_app(app)
     register_db_cli(app)
-    notify_init(app, os.environ.get('NOTIFY_URL'), os.environ.get('NOTIFY_TOKEN'))
+    notify_init(app)
     app.register_blueprint(api)
     return app
 
