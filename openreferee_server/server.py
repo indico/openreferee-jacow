@@ -302,7 +302,7 @@ def review_editable(
         "request": request.json
     })
 
-    if action == "accept":
+    if action in {'accept', 'update_accept'}:
         resp = process_accepted_revision(event, revision)
 
     return ReviewResponseSchema().dump(resp), 201

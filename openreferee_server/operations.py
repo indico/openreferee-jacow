@@ -178,7 +178,7 @@ def process_accepted_revision(event, revision):
 def _can_access_action(revision, action, user):
     if not any(x["code"] in ACTION_ROLES for x in user["roles"]):
         return False
-    if revision["type"]["name"] == "acceptance":
+    if revision["type"]["name"] in {'acceptance', 'changes_acceptance'}:
         if any(t["code"] == Tag.QA_PENDING for t in revision["tags"]):
             return action in ("approve-qa", "fail-qa")
         return action == "fail-qa"
