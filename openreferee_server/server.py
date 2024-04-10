@@ -252,6 +252,15 @@ def create_editable(
         t.daemon = True
         t.start()
 
+    notify(current_app, {
+        "event": event.identifier,
+        "contrib_id": contrib_id,
+        "action": "create",
+        "editable_type": editable_type,
+        "user": user,
+        "request": request.json
+    })
+
     replace_revision_files()
     return CreateEditableResponseSchema().dump(resp), 201
 

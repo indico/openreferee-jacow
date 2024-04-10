@@ -2,7 +2,9 @@ import json
 import logging
 import os
 import threading
-from requests.exceptions import HTTPError, ConnectionError, Timeout, RequestException
+
+from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
+
 from .operations import setup_requests_session
 
 
@@ -13,9 +15,9 @@ class NotifyService:
         self.logger = logger
         self.session = None
 
-    def log_error(self, *args) -> logging.Logger:
+    def log_error(self, *args):
         if self.logger is not None:
-            return self.logger.error(*args)
+            self.logger.error(*args)
 
     def send(self, payload):
         try:
@@ -30,7 +32,7 @@ class NotifyService:
             self.log_error("Failed to send notify payload %s", str(e))
 
     def notify(self, payload):
-        if self.url in [None, '']:
+        if not self.url:
             return
 
         if self.session is None:
@@ -43,17 +45,15 @@ def notify_init(app):
     app.config.setdefault('NOTIFY_URL', os.environ.get('NOTIFY_URL'))
     app.config.setdefault('NOTIFY_TOKEN', os.environ.get('NOTIFY_TOKEN'))
 
-    if app.config['NOTIFY_URL'] not in [None, '']:
-        app.logger.info("Enabling notifications to URL %s", app.config['NOTIFY_URL'])
-        app.logger.info("Token found: %s", app.config['NOTIFY_TOKEN'] is not None)
-
-        app.extensions['notifier'] = NotifyService(
-            app.config['NOTIFY_URL'],
-            app.config['NOTIFY_TOKEN'],
-            app.logger,
-        )
-    else:
+    if not app.config['NOTIFY_URL']:
         app.logger.warn("Skipping notifications, NOTIFY_URL missing in .env")
+        return
 
+    app.logger.info("Enabling notifications to URL %s", app.config['NOTIFY_URL'])
+    app.logger.info("Token found: %s", app.config['NOTIFY_TOKEN'] is not None)
 
-
+    app.extensions['notifier'] = NotifyService(
+        app.config['NOTIFY_URL'],
+        app.config['NOTIFY_TOKEN'],
+        app.logger,
+    )

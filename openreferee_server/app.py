@@ -5,9 +5,10 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_webframeworks.flask import FlaskPlugin
 from flask import Flask, jsonify
 from werkzeug.exceptions import HTTPException, UnprocessableEntity
-from .notify import notify_init
+
 from . import __version__
 from .db import db, register_db_cli
+from .notify import notify_init
 
 try:
     from flask_cors import CORS
