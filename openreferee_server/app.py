@@ -8,6 +8,7 @@ from werkzeug.exceptions import HTTPException, UnprocessableEntity
 
 from . import __version__
 from .db import db, register_db_cli
+from .notify import notify_init
 
 try:
     from flask_cors import CORS
@@ -26,6 +27,7 @@ def create_app():
     register_error_handlers(app)
     db.init_app(app)
     register_db_cli(app)
+    notify_init(app)
     app.register_blueprint(api)
     return app
 

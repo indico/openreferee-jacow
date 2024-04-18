@@ -44,6 +44,12 @@ from .schemas import (
 )
 
 
+def notify(app, payload):
+    service = app.extensions.get('notifier')
+    if service is not None:
+        service.notify(payload)
+
+
 def require_event_token(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -246,6 +252,15 @@ def create_editable(
         t.daemon = True
         t.start()
 
+    notify(current_app, {
+        "event": event.identifier,
+        "contrib_id": contrib_id,
+        "action": "create",
+        "editable_type": editable_type,
+        "user": user,
+        "request": request.json
+    })
+
     replace_revision_files()
     return CreateEditableResponseSchema().dump(resp), 201
 
@@ -285,6 +300,17 @@ def review_editable(
         "A new revision %r was submitted for contribution %r", revision_id, contrib_id
     )
     resp = {}
+
+    notify(current_app, {
+        "event": event.identifier,
+        "contrib_id": contrib_id,
+        "revision_id": revision_id,
+        "action": action,
+        "editable_type": editable_type,
+        "user": user,
+        "request": request.json
+    })
+
     if action in {'accept', 'update_accept'}:
         resp = process_accepted_revision(event, revision)
 
@@ -317,7 +343,7 @@ def remove_editable(event, contrib_id, editable_type):
 
 
 @api.route(
-    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/actions",  # noqa: E501
+    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/actions",
     methods=("POST",),
 )
 @use_kwargs(ServiceActionsRequestSchema(unknown=EXCLUDE), location="json")
@@ -360,7 +386,7 @@ def get_custom_revision_actions(
 
 
 @api.route(
-    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/action",  # noqa: E501
+    "/event/<identifier>/editable/<any(paper,slides,poster):editable_type>/<contrib_id>/<revision_id>/action",
     methods=("POST",),
 )
 @use_kwargs(ServiceTriggerActionRequestSchema(unknown=EXCLUDE), location="json")
