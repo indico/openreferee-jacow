@@ -1,4 +1,4 @@
-FROM python:3.11 AS builder
+FROM python:3.12 AS builder
 
 ADD . /build/
 WORKDIR /build
@@ -9,7 +9,7 @@ RUN set -ex && \
 RUN python -m build --wheel --outdir dist
 
 
-FROM python:3.11
+FROM python:3.12
 
 RUN set -ex && \
 	apt-get -y update && \
