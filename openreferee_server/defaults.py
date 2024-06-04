@@ -8,6 +8,7 @@ class Tag(str, Enum):
     PROCESSED = "PRC"
     QA_APPROVED = "QA01"
     QA_PENDING = "QA02"
+    QA_FAILED = "QA03"
 
 
 SERVICE_INFO = {"version": __version__, "name": "OpenReferee JACoW"}
@@ -35,6 +36,7 @@ DEFAULT_TAGS = {
     Tag.PROCESSED: {"title": "Processed", "color": "brown", "system": True},
     Tag.QA_APPROVED: {"title": "QA Approved", "color": "green", "system": True},
     Tag.QA_PENDING: {"title": "QA Pending", "color": "yellow", "system": True},
+    Tag.QA_FAILED: {"title": "QA Failed", "color": "red", "system": True},
 }
 DEFAULT_EDITABLES = {"paper", "poster"}
 DEFAULT_FILE_TYPES = {

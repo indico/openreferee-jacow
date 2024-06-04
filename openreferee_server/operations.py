@@ -210,13 +210,10 @@ def process_custom_action(event, revision, action, user, endpoints):
             "comments": [{"internal": True, "text": "This revision has passed QA."}],
         }
     elif action == "fail-qa":
-        response = session.post(
-            endpoints["revisions"]["reset"],
-        )
-        response.raise_for_status()
         return {
-            "tags": revision_tags,
+            "tags": revision_tags + [available_tags[Tag.QA_FAILED]["id"]],
             "publish": False,
             "comments": [{"internal": True, "text": "This revision has failed QA."}],
+            "reset": True,
         }
     return {}
