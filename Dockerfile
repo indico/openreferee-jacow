@@ -3,13 +3,15 @@ FROM python:3.12 AS builder
 ADD . /build/
 WORKDIR /build
 
-RUN set -ex && \
-	pip install -q -U pip wheel && \
-	pip install -q -e '.[dev]'
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
+
+RUN uv pip install --system --no-cache -e '.[dev]'
 RUN python -m build --wheel --outdir dist
 
 
 FROM python:3.12
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
 
 RUN set -ex && \
 	apt-get -y update && \
@@ -22,9 +24,9 @@ RUN set -ex && \
 	groupadd -r openreferee && \
 	useradd -r -g openreferee -m -d /openreferee openreferee
 
-RUN pip install -U pip setuptools wheel uwsgi
+RUN uv pip install --system --no-cache uwsgi
 COPY --from=builder /build/dist/openreferee*.whl /tmp/
-RUN pip install $(echo /tmp/openreferee*.whl)
+RUN uv pip install --system --no-cache $(echo /tmp/openreferee*.whl)
 ADD docker/run.sh docker/uwsgi.ini /
 
 USER openreferee
