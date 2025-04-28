@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import threading
 
 from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
 
@@ -21,7 +20,7 @@ class NotifyService:
 
     def send(self, payload):
         try:
-            self.session.post(self.url, json={"payload": payload})
+            self.session.post(self.url, json={"payload": payload}, timeout=10)
         except HTTPError as e:
             self.log_error("Invalid response from notify: %s", str(e))
         except ConnectionError as e:
@@ -38,7 +37,7 @@ class NotifyService:
         if self.session is None:
             self.session = setup_requests_session(self.token)
 
-        threading.Thread(target=self.send, args=(payload,)).start()
+        self.send(payload)
 
 
 def notify_init(app):
