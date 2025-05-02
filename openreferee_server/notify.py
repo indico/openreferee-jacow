@@ -20,7 +20,7 @@ class NotifyService:
 
     def send(self, payload):
         try:
-            self.session.post(self.url, json={"payload": payload})
+            self.session.post(self.url, json={"payload": payload}, timeout=10)
         except HTTPError as e:
             self.log_error("Invalid response from notify: %s", str(e))
         except ConnectionError as e:
