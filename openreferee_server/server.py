@@ -257,8 +257,6 @@ def create_editable(
         "contrib_id": contrib_id,
         "action": "create",
         "editable_type": editable_type,
-        "user": user,
-        "request": request.json
     })
 
     replace_revision_files()
@@ -307,8 +305,6 @@ def review_editable(
         "revision_id": revision_id,
         "action": action,
         "editable_type": editable_type,
-        "user": user,
-        "request": request.json
     })
 
     if action in {'accept', 'update_accept'}:
