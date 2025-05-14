@@ -227,6 +227,16 @@ def create_editable(
             application/json:
               schema: CreateEditableResponseSchema
     """
+
+    notify(current_app, {
+        "event": event.identifier,
+        "contrib_id": contrib_id,
+        "action": "create",
+        "editable_type": editable_type,
+        "user": user,
+        "request": request.json
+    })
+
     resp = {"ready_for_review": not PROCESS_EDITABLE_FILES}
     if not PROCESS_EDITABLE_FILES:
         return CreateEditableResponseSchema().dump(resp), 201
@@ -251,15 +261,6 @@ def create_editable(
         t = threading.Timer(5.0, replace_revision_files)
         t.daemon = True
         t.start()
-
-    notify(current_app, {
-        "event": event.identifier,
-        "contrib_id": contrib_id,
-        "action": "create",
-        "editable_type": editable_type,
-        "user": user,
-        "request": request.json
-    })
 
     replace_revision_files()
     return CreateEditableResponseSchema().dump(resp), 201
