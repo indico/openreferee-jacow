@@ -22,7 +22,8 @@ RUN set -ex && \
 # create an unprivileged user to run as
 RUN set -ex && \
 	groupadd -r openreferee && \
-	useradd -r -g openreferee -m -d /openreferee openreferee
+	useradd -r -g openreferee -m -d /openreferee openreferee && \
+	chmod 755 /openreferee
 
 RUN uv pip install --system --no-cache uwsgi
 COPY --from=builder /build/dist/openreferee*.whl /tmp/
